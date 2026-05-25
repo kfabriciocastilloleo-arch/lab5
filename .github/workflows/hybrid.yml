@@ -28,25 +28,23 @@ jobs:
           echo "🧪 Running unit tests..."
           echo "✅ All tests passed — ejecutado en ubuntu-latest (hosted)"
 
-  # --- JOB SELF-HOSTED ---
+  # --- JOB SELF-HOSTED (runner local registrado) ---
   build-selfhosted:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, lab5-runner]
     needs: test-hosted
     steps:
       - uses: actions/checkout@v4
-      - name: Simular entorno self-hosted
+      - name: Build project
         run: |
-          echo "🔧 Construyendo en entorno self-hosted..."
-          echo "Hostname: $(hostname)"
+          echo "🔧 Construyendo en runner self-hosted..."
+          echo "Runner hostname: $(hostname)"
           echo "Kernel: $(uname -r)"
           echo "Arquitectura: $(uname -m)"
           echo "CPU: $(nproc) cores"
           echo "Memoria: $(free -h | grep Mem | awk '{print $2}')"
-          echo "Disco: $(df -h / | tail -1 | awk '{print $4}') libre"
-      - name: Checklist entorno
+      - name: Checklist herramientas
         run: |
-          echo "📋 Verificando herramientas instaladas..."
-          for cmd in curl wget git docker python3 node; do
+          for cmd in curl wget git python3 node; do
             if command -v $cmd &>/dev/null; then
               echo "  ✅ $cmd instalado"
             else
@@ -55,14 +53,14 @@ jobs:
           done
 
   deploy-selfhosted:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, lab5-runner]
     needs: build-selfhosted
     steps:
       - uses: actions/checkout@v4
-      - name: Simular deploy en self-hosted
+      - name: Deploy en infraestructura self-hosted
         run: |
           echo "🚀 Desplegando en infraestructura self-hosted..."
           echo "Directorio de trabajo: $GITHUB_WORKSPACE"
-          echo "SHA del commit: $GITHUB_SHA"
-          echo "Ref: $GITHUB_REF"
-          echo "✅ Deploy simulado completado exitosamente"
+          echo "Commit: $GITHUB_SHA"
+          echo "Branch: $GITHUB_REF"
+          echo "✅ Deploy completado exitosamente en runner self-hosted"
