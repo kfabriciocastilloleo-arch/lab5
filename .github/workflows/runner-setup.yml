@@ -1,0 +1,52 @@
+name: Setup y Diagnóstico del Runner
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  # --- REGISTRO Y VERIFICACIÓN DEL RUNNER ---
+  verify-runner:
+    runs-on: [self-hosted, linux, lab5-runner]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verificar runner registrado
+        run: |
+          echo "━━━ VERIFICACIÓN DEL RUNNER SELF-HOSTED ━━━"
+          echo "Runner name: $(hostname)"
+          echo "OS: $(uname -s)"
+          echo "Kernel: $(uname -r)"
+          echo "Arch: $(uname -m)"
+          echo "CPU cores: $(nproc)"
+          echo "Memory: $(free -h | grep Mem | awk '{print $2}')"
+          echo "Disk: $(df -h / | tail -1 | awk '{print $4}')"
+
+  check-labels:
+    runs-on: [self-hosted, linux, lab5-runner]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validar labels
+        run: |
+          echo "✅ Labels configurados: self-hosted, linux, lab5-runner"
+          echo "📋 El runner usa estos labels para filtrar los jobs"
+
+  # --- TROUBLESHOOTING SIMULADO ---
+  simulate-path-error:
+    runs-on: [self-hosted, linux, lab5-runner]
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Path inválido
+        run: |
+          echo "🔴 Simulando error: Path inválido"
+          cat /ruta/inexistente/archivo.txt 2>&1 || echo "❌ Error: No existe el path"
+
+  simulate-dependency-error:
+    runs-on: [self-hosted, linux, lab5-runner]
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dependencia inexistente
+        run: |
+          echo "🔴 Simulando error: Dependencia inexistente"
+          some-unknown-command 2>&1 || echo "❌ Error: Comando no encontrado"
