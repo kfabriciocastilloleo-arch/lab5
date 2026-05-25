@@ -30,23 +30,39 @@ jobs:
 
   # --- JOB SELF-HOSTED ---
   build-selfhosted:
-    runs-on: [self-hosted, linux, lab5-runner]
+    runs-on: ubuntu-latest
     needs: test-hosted
     steps:
       - uses: actions/checkout@v4
-      - name: Build project
+      - name: Simular entorno self-hosted
         run: |
-          echo "🔧 Building on self-hosted runner..."
-          echo "Runner: $(uname -a)"
-          echo "✅ Build completed — ejecutado en runner self-hosted"
+          echo "🔧 Construyendo en entorno self-hosted..."
+          echo "Hostname: $(hostname)"
+          echo "Kernel: $(uname -r)"
+          echo "Arquitectura: $(uname -m)"
+          echo "CPU: $(nproc) cores"
+          echo "Memoria: $(free -h | grep Mem | awk '{print $2}')"
+          echo "Disco: $(df -h / | tail -1 | awk '{print $4}') libre"
+      - name: Checklist entorno
+        run: |
+          echo "📋 Verificando herramientas instaladas..."
+          for cmd in curl wget git docker python3 node; do
+            if command -v $cmd &>/dev/null; then
+              echo "  ✅ $cmd instalado"
+            else
+              echo "  ❌ $cmd NO instalado"
+            fi
+          done
 
   deploy-selfhosted:
-    runs-on: [self-hosted, linux, lab5-runner]
+    runs-on: ubuntu-latest
     needs: build-selfhosted
     steps:
       - uses: actions/checkout@v4
-      - name: Deploy to self-hosted environment
+      - name: Simular deploy en self-hosted
         run: |
-          echo "🚀 Deploying to self-hosted infrastructure..."
-          echo "Hostname: $(hostname)"
-          echo "✅ Deploy completed — ejecutado en runner self-hosted"
+          echo "🚀 Desplegando en infraestructura self-hosted..."
+          echo "Directorio de trabajo: $GITHUB_WORKSPACE"
+          echo "SHA del commit: $GITHUB_SHA"
+          echo "Ref: $GITHUB_REF"
+          echo "✅ Deploy simulado completado exitosamente"
